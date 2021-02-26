@@ -21,60 +21,55 @@ import feign.hc5.ApacheHttp5Client;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
-import org.springframework.cloud.test.ModifiedClassPathRunner;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Thanh Nguyen Ky
  */
-@RunWith(ModifiedClassPathRunner.class)
+@ExtendWith({SpringExtension.class})
 public class FeignHttpClient5ConfigurationTests {
 
-	private ConfigurableApplicationContext context;
-
-	@Before
-	public void setUp() {
-		this.context = new SpringApplicationBuilder()
-				.properties("debug=true", "feign.httpclient.hc5.enabled=true", "feign.httpclient.enabled=false")
-				.web(WebApplicationType.NONE).sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
-				.run();
-	}
-
-	@After
-	public void tearDown() {
-		if (context != null) {
-			context.close();
-		}
-	}
-
 	@Test
-	public void verifyHttpClient5AutoConfig() throws Exception {
+	public void verifyHttpClient5AutoConfig() {
+		ConfigurableApplicationContext context = new SpringApplicationBuilder()
+			.properties("feign.httpclient.hc5.enabled=true", "feign.httpclient.enabled=false")
+			.web(WebApplicationType.NONE).sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
+			.run();
+
 		CloseableHttpClient httpClient = context.getBean(CloseableHttpClient.class);
 		assertThat(httpClient).isNotNull();
 		HttpClientConnectionManager connectionManager = context.getBean(HttpClientConnectionManager.class);
 		assertThat(connectionManager).isInstanceOf(PoolingHttpClientConnectionManager.class);
 		Client client = context.getBean(Client.class);
 		assertThat(client).isInstanceOf(ApacheHttp5Client.class);
+
+		if (context != null) {
+			context.close();
+		}
 	}
 
 	@Test
-	public void noMoreHttpClient4Instances() throws Exception {
-		assertThatThrownBy(() -> context.getBean(org.apache.http.impl.client.CloseableHttpClient.class))
-				.isInstanceOf(NoSuchBeanDefinitionException.class);
-		assertThatThrownBy(() -> context.getBean(org.apache.http.conn.HttpClientConnectionManager.class))
-				.isInstanceOf(NoSuchBeanDefinitionException.class);
+	public void hc5ShouldWinIfTheBothVersionsAvailable() {
+		ConfigurableApplicationContext context = new SpringApplicationBuilder()
+			.properties("feign.httpclient.hc5.enabled=true", "feign.httpclient.enabled=true")
+			.web(WebApplicationType.NONE).sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
+			.run();
+
+		Client client = context.getBean(Client.class);
+		assertThat(client).isInstanceOf(ApacheHttp5Client.class);
+
+		if (context != null) {
+			context.close();
+		}
 	}
 
 }

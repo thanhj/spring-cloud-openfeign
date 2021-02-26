@@ -41,12 +41,12 @@ public class HttpClient5FeignConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean(HttpClientConnectionManager.class)
-	public HttpClientConnectionManager connectionManager(FeignHttpClientProperties httpClientProperties) {
+	public HttpClientConnectionManager hc5ConnectionManager(FeignHttpClientProperties httpClientProperties) {
 		return HttpClient5FeignConfigurationHelper.connectionManager(httpClientProperties);
 	}
 
 	@Bean
-	public CloseableHttpClient httpClient(HttpClientConnectionManager connectionManager,
+	public CloseableHttpClient httpClient5(HttpClientConnectionManager connectionManager,
 			FeignHttpClientProperties httpClientProperties) {
 		httpClient5 = HttpClient5FeignConfigurationHelper.httpClient(connectionManager, httpClientProperties);
 		return httpClient5;

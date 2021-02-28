@@ -29,11 +29,13 @@ import com.fasterxml.jackson.databind.Module;
 import feign.Client;
 import feign.Feign;
 import feign.hc5.ApacheHttp5Client;
+import feign.hc5.AsyncApacheHttp5Client;
 import feign.httpclient.ApacheHttpClient;
 import feign.okhttp.OkHttpClient;
 import okhttp3.ConnectionPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.RegistryBuilder;
@@ -296,6 +298,14 @@ public class FeignAutoConfiguration {
 	@Import(org.springframework.cloud.openfeign.clientconfig.HttpClient5FeignConfiguration.class)
 	protected static class HttpClient5FeignConfiguration {
 
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(AsyncApacheHttp5Client.class)
+	@ConditionalOnMissingBean(CloseableHttpAsyncClient.class)
+	@ConditionalOnProperty({ "feign.httpclient.hc5.enabledAsync" })
+	@Import(org.springframework.cloud.openfeign.clientconfig.AsyncHttpClient5FeignConfiguration.class)
+	protected static class AsyncHttpClient5FeignConfiguration {
 	}
 
 	static class DefaultFeignTargeterConditions extends AllNestedConditions {

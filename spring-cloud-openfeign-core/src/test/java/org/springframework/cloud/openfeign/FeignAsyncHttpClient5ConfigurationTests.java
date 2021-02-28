@@ -21,10 +21,7 @@ import feign.Client;
 import feign.hc5.ApacheHttp5Client;
 import feign.hc5.AsyncApacheHttp5Client;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
-import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.junit.jupiter.api.Test;
@@ -39,26 +36,27 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thanh Nguyen Ky
+ * @author Nguyen Ky Thanh
  */
-@ExtendWith({SpringExtension.class})
+@ExtendWith({ SpringExtension.class })
 public class FeignAsyncHttpClient5ConfigurationTests {
 
 	@Test
 	public void verifyAsyncHttpClient5AutoConfig() {
 		ConfigurableApplicationContext context = new SpringApplicationBuilder()
-			.properties("feign.httpclient.hc5.enabledAsync=true",
-				"feign.httpclient.enabled=false")
-			.web(WebApplicationType.NONE)
-			.sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
-			.run();
+				.properties("feign.httpclient.hc5.async.enabled=true",
+						"feign.httpclient.enabled=false")
+				.web(WebApplicationType.NONE)
+				.sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
+				.run();
 
-		CloseableHttpAsyncClient asyncHttpClient5 = context.getBean(CloseableHttpAsyncClient.class);
+		CloseableHttpAsyncClient asyncHttpClient5 = context
+				.getBean(CloseableHttpAsyncClient.class);
 		assertThat(asyncHttpClient5).isNotNull();
 		AsyncClientConnectionManager asyncConnectionManager = context
-			.getBean(AsyncClientConnectionManager.class);
+				.getBean(AsyncClientConnectionManager.class);
 		assertThat(asyncConnectionManager)
-			.isInstanceOf(PoolingAsyncClientConnectionManager.class);
+				.isInstanceOf(PoolingAsyncClientConnectionManager.class);
 		AsyncClient<HttpClientContext> asyncClient = context.getBean(AsyncClient.class);
 		assertThat(asyncClient).isInstanceOf(AsyncApacheHttp5Client.class);
 
@@ -70,11 +68,11 @@ public class FeignAsyncHttpClient5ConfigurationTests {
 	@Test
 	public void bothVersionsAvailable() {
 		ConfigurableApplicationContext context = new SpringApplicationBuilder()
-			.properties("feign.httpclient.hc5.enabledAsync=true",
-				"feign.httpclient.hc5.enabled=true")
-			.web(WebApplicationType.NONE)
-			.sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
-			.run();
+				.properties("feign.httpclient.hc5.async.enabled=true",
+						"feign.httpclient.hc5.enabled=true")
+				.web(WebApplicationType.NONE)
+				.sources(HttpClientConfiguration.class, FeignAutoConfiguration.class)
+				.run();
 
 		Client client = context.getBean(Client.class);
 		assertThat(client).isInstanceOf(ApacheHttp5Client.class);

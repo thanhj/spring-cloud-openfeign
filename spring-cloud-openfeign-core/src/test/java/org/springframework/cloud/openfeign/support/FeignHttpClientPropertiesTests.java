@@ -18,6 +18,7 @@ package org.springframework.cloud.openfeign.support;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.junit.After;
@@ -77,6 +78,9 @@ public class FeignHttpClientPropertiesTests {
 				.isEqualTo(DEFAULT_SOCKET_TIMEOUT);
 		assertThat(getProperties().getHc5().getSocketTimeoutUnit())
 				.isEqualTo(DEFAULT_SOCKET_TIMEOUT_UNIT);
+		assertThat(getProperties().getHc5().getAsync().getHttpVersionPolicy())
+				.isEqualTo(HttpVersionPolicy.FORCE_HTTP_1);
+
 	}
 
 	@Test
@@ -93,7 +97,9 @@ public class FeignHttpClientPropertiesTests {
 						"feign.httpclient.hc5.poolConcurrencyPolicy=lax",
 						"feign.httpclient.hc5.poolReusePolicy=lifo",
 						"feign.httpclient.hc5.socketTimeout=200",
-						"feign.httpclient.hc5.socketTimeoutUnit=milliseconds")
+						"feign.httpclient.hc5.socketTimeoutUnit=milliseconds",
+						"feign.httpclient.hc5.async.httpVersionPolicy=negotiate")
+
 				.applyTo(this.context);
 		setupContext();
 		assertThat(getProperties().getMaxConnections()).isEqualTo(2);
@@ -109,6 +115,9 @@ public class FeignHttpClientPropertiesTests {
 		assertThat(getProperties().getHc5().getSocketTimeout()).isEqualTo(200);
 		assertThat(getProperties().getHc5().getSocketTimeoutUnit())
 				.isEqualTo(TimeUnit.MILLISECONDS);
+		assertThat(getProperties().getHc5().getAsync().getHttpVersionPolicy())
+				.isEqualTo(HttpVersionPolicy.NEGOTIATE);
+
 	}
 
 	private void setupContext() {

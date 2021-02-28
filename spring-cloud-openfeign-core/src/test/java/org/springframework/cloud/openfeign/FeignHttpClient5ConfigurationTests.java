@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Thanh Nguyen Ky
+ * @author Nguyen Ky Thanh
  */
 @ExtendWith({ SpringExtension.class })
 public class FeignHttpClient5ConfigurationTests {

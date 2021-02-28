@@ -308,6 +308,14 @@ public class FeignAutoConfiguration {
 	protected static class AsyncHttpClient5FeignConfiguration {
 	}
 
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(AsyncApacheHttp5Client.class)
+	@ConditionalOnMissingBean(CloseableHttpAsyncClient.class)
+	@ConditionalOnProperty({ "feign.httpclient.hc5.enabledAsync" })
+	@Import(org.springframework.cloud.openfeign.clientconfig.AsyncHttpClient5FeignConfiguration.class)
+	protected static class AsyncHttpClient5FeignConfiguration {
+	}
+
 	static class DefaultFeignTargeterConditions extends AllNestedConditions {
 
 		DefaultFeignTargeterConditions() {

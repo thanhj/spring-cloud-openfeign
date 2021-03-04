@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.netflix.hystrix.HystrixCommand;
+import feign.AsyncFeign;
 import feign.Contract;
 import feign.Feign;
 import feign.Logger;
@@ -30,6 +31,7 @@ import feign.form.MultipartFormContentProcessor;
 import feign.form.spring.SpringFormEncoder;
 import feign.hystrix.HystrixFeign;
 import feign.optionals.OptionalDecoder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -152,6 +154,13 @@ public class FeignClientsConfiguration {
 	@ConditionalOnMissingBean
 	public Feign.Builder feignBuilder(Retryer retryer) {
 		return Feign.builder().retryer(retryer);
+	}
+
+	@Bean
+	@Scope("prototype")
+	@ConditionalOnMissingBean
+	public AsyncFeign.AsyncBuilder<HttpClientContext> feignAsyncBuilder() {
+		return AsyncFeign.asyncBuilder();
 	}
 
 	@Bean

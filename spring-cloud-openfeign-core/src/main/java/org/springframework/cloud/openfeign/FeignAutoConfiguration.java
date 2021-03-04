@@ -26,14 +26,18 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 
 import com.fasterxml.jackson.databind.Module;
+import feign.AsyncClient;
 import feign.Client;
 import feign.Feign;
 import feign.hc5.ApacheHttp5Client;
+import feign.hc5.AsyncApacheHttp5Client;
 import feign.httpclient.ApacheHttpClient;
 import feign.okhttp.OkHttpClient;
 import okhttp3.ConnectionPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.RegistryBuilder;
@@ -304,6 +308,20 @@ public class FeignAutoConfiguration {
 			return new ApacheHttp5Client(httpClient5);
 		}
 
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(AsyncApacheHttp5Client.class)
+	@ConditionalOnMissingBean(CloseableHttpAsyncClient.class)
+	@ConditionalOnProperty({ "feign.httpclient.hc5.async.enabled" })
+	@Import(org.springframework.cloud.openfeign.clientconfig.AsyncHttpClient5FeignConfiguration.class)
+	protected static class AsyncHttpClient5FeignConfiguration {
+		@Bean
+		@ConditionalOnMissingBean(Client.class)
+		public AsyncClient<HttpClientContext> asyncFeignClient(
+			CloseableHttpAsyncClient asyncHttpClient5) {
+			return new AsyncApacheHttp5Client(asyncHttpClient5);
+		}
 	}
 
 	static class DefaultFeignTargeterConditions extends AllNestedConditions {

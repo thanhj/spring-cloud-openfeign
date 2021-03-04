@@ -27,15 +27,21 @@
 			"defaultValue": "true"
 		},
 		{
+			"name": "feign.okhttp.enabled",
+			"type": "java.lang.Boolean",
+			"description": "Enables the use of the OK HTTP Client by Feign.",
+			"defaultValue": "false"
+		},
+		{
 			"name": "feign.httpclient.hc5.enabled",
 			"type": "java.lang.Boolean",
 			"description": "Enables the use of the Apache HTTP Client 5 by Feign.",
 			"defaultValue": "false"
 		},
 		{
-			"name": "feign.okhttp.enabled",
+			"name": "feign.httpclient.hc5.async.enabled",
 			"type": "java.lang.Boolean",
-			"description": "Enables the use of the OK HTTP Client by Feign.",
+			"description": "Enables the use of the Apache Async HTTP Client 5 by Feign.",
 			"defaultValue": "false"
 		},
 		{

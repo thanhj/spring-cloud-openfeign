@@ -16,8 +16,10 @@
 
 package org.springframework.cloud.openfeign;
 
+import feign.AsyncFeign;
 import feign.Feign;
 import feign.Target;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 
 /**
  * @author Spencer Gibb
@@ -26,5 +28,11 @@ interface Targeter {
 
 	<T> T target(FeignClientFactoryBean factory, Feign.Builder feign,
 			FeignContext context, Target.HardCodedTarget<T> target);
+
+	default <T> T target(FeignClientFactoryBean factory,
+			AsyncFeign.AsyncBuilder<HttpClientContext> asyncBuilder, FeignContext context,
+			Target.HardCodedTarget<T> target) {
+		return asyncBuilder.target(target);
+	}
 
 }

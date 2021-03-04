@@ -18,6 +18,7 @@ package org.springframework.cloud.openfeign.support;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 
@@ -197,10 +198,9 @@ public class FeignHttpClientProperties {
 		 */
 		private int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
 
-		/**
-		 * Default value for socket timeout unit.
-		 */
 		private TimeUnit socketTimeoutUnit = DEFAULT_SOCKET_TIMEOUT_UNIT;
+
+		private Hc5AsyncProperties async = new Hc5AsyncProperties();
 
 		public PoolConcurrencyPolicy getPoolConcurrencyPolicy() {
 			return this.poolConcurrencyPolicy;
@@ -233,6 +233,33 @@ public class FeignHttpClientProperties {
 
 		public void setSocketTimeout(int socketTimeout) {
 			this.socketTimeout = socketTimeout;
+		}
+
+		public Hc5AsyncProperties getAsync() {
+			return async;
+		}
+
+		public void setAsync(Hc5AsyncProperties async) {
+			this.async = async;
+		}
+
+	}
+
+	public static class Hc5AsyncProperties {
+
+		/**
+		 * Default value for Http version policy.
+		 */
+		private static final HttpVersionPolicy DEFAULT_HTTP_VERSION_POLICY = HttpVersionPolicy.FORCE_HTTP_1;
+
+		private HttpVersionPolicy httpVersionPolicy = DEFAULT_HTTP_VERSION_POLICY;
+
+		public HttpVersionPolicy getHttpVersionPolicy() {
+			return httpVersionPolicy;
+		}
+
+		public void setHttpVersionPolicy(HttpVersionPolicy httpVersionPolicy) {
+			this.httpVersionPolicy = httpVersionPolicy;
 		}
 
 	}

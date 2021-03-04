@@ -22,6 +22,8 @@ import javax.net.ssl.SSLContextSpi;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
+import feign.Client;
+import feign.hc5.ApacheHttp5Client;
 import org.apache.hc.client5.http.impl.io.DefaultHttpClientConnectionOperator;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
@@ -48,25 +50,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 		properties = { "feign.httpclient.disableSslValidation=true",
 				"feign.httpclient.hc5.enabled=true", "feign.httpclient.enabled=false" })
 @DirtiesContext
-public class FeignRibbonHttpClient5ConfigurationTests {
+class FeignRibbonHttpClient5ConfigurationTests {
 
 	@Autowired
-	HttpClientConnectionManager connectionManager;
+	private HttpClientConnectionManager connectionManager;
+
+	@Autowired
+	private Client client;
 
 	@Test
-	public void disableSslTest() throws Exception {
+	void disableSslTest() throws Exception {
 		Lookup<ConnectionSocketFactory> socketFactoryRegistry = getConnectionSocketFactoryLookup(
-				this.connectionManager);
+				connectionManager);
 		assertThat(socketFactoryRegistry.lookup(URIScheme.HTTPS.id)).isNotNull();
-		assertThat(this.getX509TrustManager(socketFactoryRegistry).getAcceptedIssuers())
+		assertThat(getX509TrustManager(socketFactoryRegistry).getAcceptedIssuers())
 				.isNull();
+	}
+
+	@Test
+	void verifyHttpClient5IsPickedUp() {
+		assertThat(client).isInstanceOf(LoadBalancerFeignClient.class);
+		Client delegate = (Client) getField(client, "delegate");
+		assertThat(delegate).isInstanceOf(ApacheHttp5Client.class);
 	}
 
 	private Lookup<ConnectionSocketFactory> getConnectionSocketFactoryLookup(
 			HttpClientConnectionManager connectionManager) {
 		DefaultHttpClientConnectionOperator connectionOperator = (DefaultHttpClientConnectionOperator) this
 				.getField(connectionManager, "connectionOperator");
-		return (Lookup) this.getField(connectionOperator, "socketFactoryRegistry");
+		return (Lookup) getField(connectionOperator, "socketFactoryRegistry");
 	}
 
 	private X509TrustManager getX509TrustManager(
@@ -75,9 +87,8 @@ public class FeignRibbonHttpClient5ConfigurationTests {
 				.lookup(URIScheme.HTTPS.id);
 		SSLSocketFactory sslSocketFactory = (SSLSocketFactory) this
 				.getField(connectionSocketFactory, "socketFactory");
-		SSLContextSpi sslContext = (SSLContextSpi) this.getField(sslSocketFactory,
-				"context");
-		return (X509TrustManager) this.getField(sslContext, "trustManager");
+		SSLContextSpi sslContext = (SSLContextSpi) getField(sslSocketFactory, "context");
+		return (X509TrustManager) getField(sslContext, "trustManager");
 	}
 
 	protected <T> Object getField(Object target, String name) {

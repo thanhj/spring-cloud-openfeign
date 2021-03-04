@@ -28,9 +28,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import feign.AsyncClient;
-import feign.Client;
-import feign.hc5.AsyncApacheHttp5Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -38,7 +35,6 @@ import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.ssl.TLS;
@@ -100,13 +96,6 @@ public class AsyncHttpClient5FeignConfiguration {
 						.build())
 				.build();
 		return asyncHttpClient5;
-	}
-
-	@Bean
-	@ConditionalOnMissingBean(Client.class)
-	public AsyncClient<HttpClientContext> asyncFeignClient(
-			CloseableHttpAsyncClient asyncHttpClient5) {
-		return new AsyncApacheHttp5Client(asyncHttpClient5);
 	}
 
 	@PreDestroy
